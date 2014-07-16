@@ -10,7 +10,7 @@ Define the function for passing a URL to PyCurl and call the Panorama API
 '''
 def apicall(device, apitype, xpath):
         
-   if apitype == 'config':
+    if apitype == 'config':
         apiprefix = '.netsec.ebay.com/api/?type=config&action=get&xpath='
     elif apitype == 'op':
         apiprefix = '.netsec.ebay.com/api/?type=op&cmd='
@@ -22,7 +22,7 @@ def apicall(device, apitype, xpath):
         excode = 'API type %s is unknown' % (apitype)
         exit(excode)
     
-    key = "LUFRPT1IbTNuamNNMWFTOXI5TWt2dFNoZVRvVFZhVUE9MXpIWFRlNG8rNmpYMnBJbENYVkJDVE15Ym50cnZ6Wlhrc0J3bTkzdVVZST0=" 
+    key = "LUFRPT1KZWhsZU95ZmU4SEJhd2xyUlZ6WWF2ZkkrTEE9VjZVZzNNZlNSUWd5VW9PemxXaUxIWEYzZFhpWU5adDlLd1F4Vm1LTEE2bz0=" 
         
     url = "https://%s%s%s&key=%s" % (device, apiprefix, xpath, key)
     buff = cStringIO.StringIO()
