@@ -5,10 +5,8 @@ import smtplib
 from email.mime.text import MIMEText
 from datetime import datetime
 
-#startTime = datetime.now() # Checking script runtime for optimizations which there aren't really any :(
-
-def send_error(deviceHostname, psDesc, psAlarm, psInserted):
-    failed = "%s FAILED: %s\nAlarm: %s\nInserted: %s\n\nYou can stop e-mail alerts by adding the hostname in the subject to the 'ignore-hosts.txt' file on netapp-01.sc5:/home/paloapi" % (deviceHostname, psDesc, psAlarm, psInserted)
+def send_error(deviceHostname, psDesc, psAlarm, psInserted, deviceAddress):
+    failed = "%s FAILED: %s\nIP Address: %s\nAlarm: %s\nInserted: %s\n\nYou can stop e-mail alerts by adding the hostname in the subject to the 'ignore-hosts.txt' file on netapp-01.sc5:/home/paloapi" % (deviceHostname, psDesc, deviceAddress, psAlarm, psInserted)
     
     msg = MIMEText(failed)
     addr = 'netsecurity@ebay.com'
@@ -34,18 +32,15 @@ for i in range(len(devices)):
         deviceFamily = devices[i].family.contents[0]
         deviceHostname = devices[i].hostname.contents[0]
         deviceAddress = devices[i].find('ip-address').contents[0]
-        #print deviceFamily, deviceHostname, deviceAddress
         
-        count = 0
         if deviceFamily != '2000' and deviceFamily != '3000' and deviceFamily != '500': # Models which are single cord and we can ignore
-            count += 1
             xpath = '<show><system><environmentals><power-supply></power-supply></environmentals></system></show>'
             xmlout = panapi.apicall(deviceAddress, 'ip-op', xpath)
             soup = xmlparse(xmlout)
             psUnit = soup.find('power-supply').findAll('entry') # Create a list of power supplies so we can iterate through them
 
             checked = 0
-            for x in range(len(psUnit)): # Sloppy way to do a for loop
+            for x in range(len(psUnit)): 
                 if psUnit[x] is None:
                     pass
                 else:
@@ -61,9 +56,8 @@ for i in range(len(devices)):
                         if any(deviceHostname in s for s in ignore.readlines()):
                             pass
                         else:
-                            #send_error(deviceHostname, psDesc, psAlarm, psInserted)
-                            print deviceFamily, deviceHostname, deviceAddress
-                            status = "%s - %s has a FAILED" % (deviceHostname, psDesc)
+                            send_error(deviceHostname, psDesc, psAlarm, psInserted, deviceAddress)
+                            #print "%s FAILED Power Supply: %s\nIP Address: %s\nAlarm: %s\nInserted: %s\n" % (deviceHostname, psDesc, deviceAddress, psAlarm, psInserted)
                         ignore.close()
                                
                     else:
@@ -72,5 +66,3 @@ for i in range(len(devices)):
                         fo.write(status)
                     
                     fo.close()
-                        
-#print "Finished - Script executed in %s" % (datetime.now()-startTime)
