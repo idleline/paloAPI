@@ -35,9 +35,8 @@ handler.setFormatter(formatter)
 
 logger.addHandler(handler)
 
-def send_errorPS(deviceHostname, psDesc, psAlarm, psInserted, deviceAddress):
-    failed = "%s FAILED: %s\nIP Address: %s\nAlarm: %s\nInserted: %s\n\nYou can stop e-mail alerts by adding the hostname in the subject to the 'ignore-hosts.txt' file on netapp-01.sc5:/home/paloapi" % (deviceHostname, psDesc, deviceAddress, psAlarm, psInserted)
-    
+def send_error(deviceHostname, psDesc, failed):
+        
     msg = MIMEText(failed)
     addr = 'netsecurity@ebay.com'
     to = ['opsalerts@ebay.com', 'netsecurity@ebay.com']
@@ -89,7 +88,8 @@ def main(devices):
                             if any(deviceHostname in s for s in ignore.readlines()):
                                 logger.warn('IGNORED - %s has failed power supply %s but entry in ignore-hosts.txt was found - No alert sent' % (deviceHostname, psDesc))
                             else:
-                                send_errorPS(deviceHostname, psDesc, psAlarm, psInserted, deviceAddress)
+                                failed = "%s FAILED: %s\nIP Address: %s\nAlarm: %s\nInserted: %s\n\nYou can stop e-mail alerts by adding the hostname in the subject to the 'ignore-hosts.txt' file on netapp-01.sc5:/home/paloapi" % (deviceHostname, psDesc, deviceAddress, psAlarm, psInserted)
+                                #send_error(deviceHostname, psDesc, failed)
                                 logger.info('Host: %s -- Unit: %s -- Inserted: %s -- Alarm: %s' % (deviceHostname, psDesc, psInserted, psAlarm))
                             ignore.close()
                                    

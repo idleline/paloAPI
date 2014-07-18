@@ -25,6 +25,7 @@ def apicall(device, apitype, xpath):
     key = "LUFRPT1KZWhsZU95ZmU4SEJhd2xyUlZ6WWF2ZkkrTEE9VjZVZzNNZlNSUWd5VW9PemxXaUxIWEYzZFhpWU5adDlLd1F4Vm1LTEE2bz0=" 
         
     url = "https://%s%s%s&key=%s" % (device, apiprefix, xpath, key)
+    print url
     buff = cStringIO.StringIO()
     
     '''
