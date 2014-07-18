@@ -21,7 +21,7 @@ entries = soup.devices.findAll('entry') # Parse XML data from API call
 
 '''Logger Settings
 '''
-logLevel = logging.DEBUG # Modify this with either (logging.INFO or logging.DEBUG) to change log verbosity
+logLevel = logging.INFO # Modify this with either (logging.INFO or logging.DEBUG) to change log verbosity
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logLevel) 

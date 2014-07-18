@@ -1,13 +1,5 @@
 <<<<<<< HEAD
 
 .project
-
 .pydevproject
-
 ignore-hosts.txt
-=======
-ignore-hosts.txt
-ps-status.txt
->>>>>>> FETCH_HEAD
-ignore-hosts.txt
-ps-status.txt
