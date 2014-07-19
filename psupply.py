@@ -7,7 +7,6 @@ from datetime import datetime
 import logging
 from logging import handlers
 
-
 ''' Set API Parameters
 xpath: this API call polls every device connected to Panorama
 xmlout: Store XML returned from panapi module of all the devices
@@ -35,9 +34,20 @@ handler.setFormatter(formatter)
 
 logger.addHandler(handler)
 
-def send_error(deviceHostname, psDesc, failed):
-        
-    msg = MIMEText(failed)
+'''Error messages
+Error messages used in __main__
+'''
+fileErr = 'Error opening ignore-hosts.txt - Please make sure this file exists even if it is empty - Error %s'
+devIgnore = 'IGNORED - %s has failed power supply %s but entry in ignore-hosts.txt was found - No alert sent'
+sendErr = "%s FAILED: %s\nIP Address: %s\nAlarm: %s\nInserted: %s\n\nYou can stop e-mail alerts by adding the hostname in the subject to the 'ignore-hosts.txt' file on netapp-01.sc5:/home/paloapi"
+errInfo = 'Host: %s -- Unit: %s -- Inserted: %s -- Alarm: %s'
+exSum = 'Execution Summary - Dual cord devices reported: %s -- Checked Devices: %s'
+exWarn = 'Not all devices were successfully checked - Dual cord devices reported: %s -- Checked Devices: %s'
+msgStart = 'SMTP message in MIME format intitiated'
+
+def send_error(deviceHostname, psDesc, message):
+    logger.debug(msgStart)    
+    msg = MIMEText(message)
     addr = 'netsecurity@ebay.com'
     to = ['opsalerts@ebay.com', 'netsecurity@ebay.com']
      
@@ -83,14 +93,13 @@ def main(devices):
                             try:
                                 ignore = open('ignore-hosts.txt', 'r') # Check if a device is in the ignore list
                             except IOError, e:
-                                logger.error('Error opening ignore-hosts.txt - Please make sure this file exists even if it is empty - Error %s' % (e))
+                                logger.error(fileErr % (e))
                                 exit()
                             if any(deviceHostname in s for s in ignore.readlines()):
-                                logger.warn('IGNORED - %s has failed power supply %s but entry in ignore-hosts.txt was found - No alert sent' % (deviceHostname, psDesc))
+                                logger.warn(devIgnore % (deviceHostname, psDesc))
                             else:
-                                failed = "%s FAILED: %s\nIP Address: %s\nAlarm: %s\nInserted: %s\n\nYou can stop e-mail alerts by adding the hostname in the subject to the 'ignore-hosts.txt' file on netapp-01.sc5:/home/paloapi" % (deviceHostname, psDesc, deviceAddress, psAlarm, psInserted)
-                                #send_error(deviceHostname, psDesc, failed)
-                                logger.info('Host: %s -- Unit: %s -- Inserted: %s -- Alarm: %s' % (deviceHostname, psDesc, psInserted, psAlarm))
+                                #send_error(deviceHostname, psDesc, sendErr % (deviceHostname, psDesc, deviceAddress, psAlarm, psInserted))
+                                logger.info(errInfo % (deviceHostname, psDesc, psInserted, psAlarm))
                             ignore.close()
                                    
                         else:
@@ -98,10 +107,10 @@ def main(devices):
                             logger.debug(status)
     if checked / 2 == total:
        print "All devices checked"
-       logger.info('Execution Summary - Dual cord devices reported: %s -- Checked Devices: %s' % (total, checked / 2 ))
+       logger.info(exSum % (total, checked / 2 ))
     else:
        print "Total: %s - Checked: %s" % (total, checked / 2)
-       logger.warn('Not all devices were successfully checked - Dual cord devices reported: %s -- Checked Devices: %s' % (total, checked / 2))
+       logger.warn(exWarn % (total, checked / 2))
 
 if __name__ == "__main__":
     logger.info('Executing main')
