@@ -7,33 +7,6 @@ from datetime import datetime
 import logging
 from logging import handlers
 
-''' Set API Parameters
-xpath: this API call polls every device connected to Panorama
-xmlout: Store XML returned from panapi module of all the devices
-soup: use BS to index the XML so we can manipulate it
-devices: Create a list of entries so we can go through them in iteration
-'''
-xpath = '<show><devices><connected></connected></devices></show>'
-xmlout = panapi.apicall('panorama', 'op', xpath) # Execute API
-soup = xmlparse(xmlout)
-entries = soup.devices.findAll('entry') # Parse XML data from API call
-
-'''Logger Settings
-'''
-logLevel = logging.INFO # Modify this with either (logging.INFO or logging.DEBUG) to change log verbosity
-
-logger = logging.getLogger(__name__)
-logger.setLevel(logLevel) 
-
-log_path = '/Users/lwheelock/scripts/solera/dev/psupply.log'
-handler = handlers.RotatingFileHandler(log_path, maxBytes=10000000, backupCount=4)
-handler.setLevel(logLevel)
-
-formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
-handler.setFormatter(formatter)
-
-logger.addHandler(handler)
-
 '''Error messages
 Error messages used in __main__
 '''
@@ -44,6 +17,23 @@ errInfo = 'Host: %s -- Unit: %s -- Inserted: %s -- Alarm: %s'
 exSum = 'Execution Summary - Dual cord devices reported: %s -- Checked Devices: %s'
 exWarn = 'Not all devices were successfully checked - Dual cord devices reported: %s -- Checked Devices: %s'
 msgStart = 'SMTP message in MIME format intitiated'
+msgEntries = "Found %s devices connected to Panorama"
+
+'''Logger Settings
+'''
+logLevel = logging.DEBUG # Modify this with either (logging.INFO or logging.DEBUG) to change log verbosity
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logLevel) 
+
+log_path = './../local/psupply.log'
+handler = handlers.RotatingFileHandler(log_path, maxBytes=10000000, backupCount=4)
+handler.setLevel(logLevel)
+
+formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+handler.setFormatter(formatter)
+
+logger.addHandler(handler)
 
 def send_error(deviceHostname, psDesc, message):
     logger.debug(msgStart)    
@@ -57,7 +47,7 @@ def send_error(deviceHostname, psDesc, message):
     
     s = smtplib.SMTP('atom.corp.ebay.com')
     s.sendmail(addr, to, msg.as_string())
-    s.quit 
+    s.quit
     
     logger.info('e-mail sent for %s - Failed Power Supply: %s' % (deviceHostname, psDesc))
 
@@ -111,6 +101,18 @@ def main(devices):
     else:
        print "Total: %s - Checked: %s" % (total, checked / 2)
        logger.warn(exWarn % (total, checked / 2))
+       
+''' Set API Parameters
+xpath: this API call polls every device connected to Panorama
+xmlout: Store XML returned from panapi module of all the devices
+soup: use BS to index the XML so we can manipulate it
+devices: Create a list of entries so we can go through them in iteration
+'''
+xpath = '<show><devices><connected></connected></devices></show>'
+xmlout = panapi.apicall('panorama', 'op', xpath) # Execute API
+soup = xmlparse(xmlout)
+entries = soup.devices.findAll('entry') # Parse XML data from API call
+logger.debug(msgEntries % (len(entries)))
 
 if __name__ == "__main__":
     logger.info('Executing main')
