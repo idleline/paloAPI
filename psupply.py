@@ -56,8 +56,8 @@ for i in range(len(devices)):
                         if any(deviceHostname in s for s in ignore.readlines()):
                             pass
                         else:
-                            send_error(deviceHostname, psDesc, psAlarm, psInserted, deviceAddress)
-                            #print "%s FAILED Power Supply: %s\nIP Address: %s\nAlarm: %s\nInserted: %s\n" % (deviceHostname, psDesc, deviceAddress, psAlarm, psInserted)
+                            #send_error(deviceHostname, psDesc, psAlarm, psInserted, deviceAddress)
+                            print "%s FAILED Power Supply: %s\nIP Address: %s\nAlarm: %s\nInserted: %s\n" % (deviceHostname, psDesc, deviceAddress, psAlarm, psInserted)
                         ignore.close()
                                
                     else:
