@@ -12,6 +12,8 @@ def apicall(device, apitype, xpath):
         
     if apitype == 'config':
         apiprefix = '.netsec.ebay.com/api/?type=config&action=get&xpath='
+    elif apitype == 'configset':
+        apiprefix = '.netsec.ebay.com/api/?type=config&action=set&xpath='
     elif apitype == 'op':
         apiprefix = '.netsec.ebay.com/api/?type=op&cmd='
     elif apitype == 'ip-op':
