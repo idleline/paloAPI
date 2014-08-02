@@ -114,6 +114,48 @@ soup = xmlparse(xmlout)
 entries = soup.devices.findAll('entry') # Parse XML data from API call
 logger.debug(msgEntries % (len(entries)))
 
+for i in range(len(devices)):
+    if devices[i].family is None: # Sloppy error checking
+        pass
+    else: # Set up our env check on the device
+        deviceFamily = devices[i].family.contents[0]
+        deviceHostname = devices[i].hostname.contents[0]
+        deviceAddress = devices[i].find('ip-address').contents[0]
+        
+        if deviceFamily != '2000' and deviceFamily != '3000' and deviceFamily != '500': # Models which are single cord and we can ignore
+            xpath = '<show><system><environmentals><power-supply></power-supply></environmentals></system></show>'
+            xmlout = panapi.apicall(deviceAddress, 'ip-op', xpath)
+            soup = xmlparse(xmlout)
+            psUnit = soup.find('power-supply').findAll('entry') # Create a list of power supplies so we can iterate through them
+
+            checked = 0
+            for x in range(len(psUnit)): 
+                if psUnit[x] is None:
+                    pass
+                else:
+                    psAlarm = psUnit[x].alarm.contents[0]
+                    psInserted = psUnit[x].inserted.contents[0]
+                    psDesc = psUnit[x].description.contents[0]
+                    
+                    fo = open('ps-status.txt', 'a') # Write our status to a file
+                    
+                    if psAlarm == "True" or psInserted == "False":
+                        ignore = open('ignore-hosts.txt', 'r') # Check if a device is in the ignore list
+        
+                        if any(deviceHostname in s for s in ignore.readlines()):
+                            pass
+                        else:
+                            #send_error(deviceHostname, psDesc, psAlarm, psInserted, deviceAddress)
+                            print "%s FAILED Power Supply: %s\nIP Address: %s\nAlarm: %s\nInserted: %s\n" % (deviceHostname, psDesc, deviceAddress, psAlarm, psInserted)
+                        ignore.close()
+                               
+                    else:
+                        status = "%s - %s is OK" % (deviceHostname, psDesc)
+                        status = status + '\n'
+                        fo.write(status)
+                    
+                    fo.close()
+                    
 if __name__ == "__main__":
     logger.info('Executing main')
     main(entries)
