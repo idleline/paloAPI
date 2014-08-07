@@ -114,7 +114,6 @@ soup = xmlparse(xmlout)
 entries = soup.devices.findAll('entry') # Parse XML data from API call
 logger.debug(msgEntries % (len(entries)))
 
-<<<<<<< HEAD
 for i in range(len(devices)):
     if devices[i].family is None: # Sloppy error checking
         pass
@@ -156,8 +155,6 @@ for i in range(len(devices)):
                         fo.write(status)
                     
                     fo.close()
-=======
 if __name__ == "__main__":
     logger.info('Executing main')
     main(entries)
->>>>>>> a87b9e4b4a6b8c43b9773c336606ddfa8b8ebc45
