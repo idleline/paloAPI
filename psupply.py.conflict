@@ -155,7 +155,10 @@ for i in range(len(devices)):
                         fo.write(status)
                     
                     fo.close()
+<<<<<<< HEAD
+=======
                     
+>>>>>>> 06645c926ea04e915fa62aa80584eb385c6c4082
 if __name__ == "__main__":
     logger.info('Executing main')
     main(entries)
