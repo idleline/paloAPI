@@ -1,7 +1,7 @@
 import panapi
 import re
 
-fo = open('/Users/lwheelock/Dropbox/Projects/BCN/bcn-all-rules.txt')
+fo = open('/Users/lwheelock/Dropbox/Projects/BCN/v2-checker.csv')
 
 def portSub(port, app, proto):
     if app == 'dell-drac':
@@ -51,12 +51,12 @@ fwAllow = open('allow-bcn.txt', 'w')
 fwDeny = open('deny-bcn.txt', 'w')
 
 for line in fo.readlines():
-    rule = line.split()
+    rule = line.split(',')
     
     srcIP = '10.227.81.10'
     dstIP = rule[1].lstrip('bcn-cn-')
     port = rule[2].lstrip('TCP')
-    app = rule[3]
+    app = rule[3].rstrip()
     proto = '6'
     
     if port == 'application-default':
@@ -69,11 +69,13 @@ for line in fo.readlines():
     allow = re.search("action allow;", result)
     
     if allow:
-        entry = "%s %s %s %s %s" % (srcIP, dstIP, port, app, proto)
+        entry = "%s %s %s %s" % (srcIP, dstIP, port, app)
         fwAllow.write(entry)
+        print 'Allowed:', entry
     else:
-        entry = "%s %s %s %s %s" % (srcIP, dstIP, port, app, proto)
+        entry = "%s %s %s %s" % (srcIP, dstIP, port, app)
         fwDeny.write(entry)
+        print 'Denied:', entry
           
 fwAllow.close()
 fwDeny.close()

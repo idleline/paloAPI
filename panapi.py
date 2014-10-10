@@ -24,7 +24,7 @@ def apicall(device, apitype, xpath):
         excode = 'API type %s is unknown' % (apitype)
         exit(excode)
     
-    key = "LUFRPT1KZWhsZU95ZmU4SEJhd2xyUlZ6WWF2ZkkrTEE9VjZVZzNNZlNSUWd5VW9PemxXaUxIWEYzZFhpWU5adDlLd1F4Vm1LTEE2bz0=" 
+    key = "LUFRPT1KZWhsZU95ZmU4SEJhd2xyUlZ6WWF2ZkkrTEE9VjZVZzNNZlNSUWd5VW9PemxXaUxIWEYzZFhpWU5adDlLd1F4Vm1LTEE2bz0" 
         
     url = "https://%s%s%s&key=%s" % (device, apiprefix, xpath, key)
     buff = cStringIO.StringIO()
